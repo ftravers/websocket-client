@@ -1,4 +1,4 @@
-(defproject websocket-client "0.3.4-SNAPSHOT"
+(defproject websocket-client "0.3.5-SNAPSHOT"
   :description "WebSocket Client Library"
   :url "https://github.com/ftravers/websocket-client"
   :license {:name "Eclipse Public License"
@@ -25,12 +25,11 @@
                            :verbose true
                            :source-map-timestamp true}}]}
 
-  :repositories [["clojars" {:url "https://clojars.org/repo" :username "ftravers" :password "fKDRSm7pm"}]
-                 ;; ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ;; ["releases" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ;; ["alternate" {:url "https://clojars.org/repo" :creds :gpg} ]
-                 ]
-
+  :repositories [["clojars" {:url "https://clojars.org/repo" :creds :gpg}]
+                 ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]
+                 ["releases" {:url "https://clojars.org/repo" :creds :gpg}]
+                 ["alternate" {:url "https://clojars.org/repo" :creds :gpg} ]]
+  
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [figwheel-sidecar "0.5.4-7"]                                   
                                   [com.cemerick/piggieback "0.2.1"]]
