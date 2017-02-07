@@ -25,15 +25,11 @@
                            :verbose true
                            :source-map-timestamp true}}]}
 
-  :repositories [["clojars" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ["releases" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ["alternate" {:url "https://clojars.org/repo" :creds :gpg} ]]
+  ;; :repositories [["clojars" {:url "https://clojars.org/repo" :creds :gpg}]
+  ;;                ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]
+  ;;                ["releases" {:url "https://clojars.org/repo" :creds :gpg}]
+  ;;                ["alternate" {:url "https://clojars.org/repo" :creds :gpg} ]]
 
-  :repositories [["snapshots" "https://internal.repo/snapshots"]
-                 ["releases" "https://internal.repo/releases"]
-                 ["alternate" "https://other.server/repo"]]
-  
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [figwheel-sidecar "0.5.4-7"]                                   
                                   [com.cemerick/piggieback "0.2.1"]]
