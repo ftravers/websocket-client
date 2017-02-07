@@ -1,4 +1,4 @@
-(defproject websocket-client "0.3.5"
+(defproject websocket-client "0.3.6-SNAPSHOT"
   :description "WebSocket Client Library"
   :url "https://github.com/ftravers/websocket-client"
   :license {:name "Eclipse Public License"
@@ -12,7 +12,7 @@
   :target-path "target/%s"
   :plugins [[lein-figwheel "0.5.4-7"]
             [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
-            [cider/cider-nrepl "0.15.0-SNAPSHOT"]
+            [cider/cider-nrepl "0.14.0"]
             [lein-pprint "1.1.2"]]
   :cljsbuild {:builds
               [{:id "dev"
