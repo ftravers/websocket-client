@@ -1,7 +1,7 @@
 * WebSocket Client
 
 This is the cljs (client) side of the websocket connection.  This
-should be paired with [[https://github.com/ftravers/websocket-server][ftravers/websocket-server].
+should be paired with [[https://github.com/ftravers/websocket-server][ftravers/websocket-server]].
 
 * Clojars
 
