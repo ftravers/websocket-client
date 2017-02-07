@@ -12,7 +12,7 @@
 # WebSocket Client<a id="sec-1" name="sec-1"></a>
 
 This is the cljs (client) side of the websocket connection.  This
-should be paired with [[<https://github.com/ftravers/websocket-server][ftravers/websocket-server>].
+should be paired with [ftravers/websocket-server](https://github.com/ftravers/websocket-server).
 
 # Clojars<a id="sec-2" name="sec-2"></a>
 
