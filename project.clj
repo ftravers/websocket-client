@@ -1,4 +1,4 @@
-(defproject websocket-client "0.1.1"
+(defproject websocket-client "0.2.1-SNAPSHOT"
   :description "WebSocket Client Library"
   :url "https://github.com/ftravers/websocket-client"
   :license {:name "Eclipse Public License"
