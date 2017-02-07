@@ -1,0 +1,14 @@
+* WebSocket Client
+
+This is the cljs (client) side of the websocket connection.  This
+should be paired with [[https://github.com/ftravers/websocket-server][ftravers/websocket-server].
+
+* Clojars
+
+[fentontravers/websocket-client "0.3.7"]
+
+* Usage
+
+#+BEGIN_SRC clojure
+
+#+END_SRC

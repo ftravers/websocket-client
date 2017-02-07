@@ -1,36 +1,21 @@
-# websocket-client
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. WebSocket Client</a></li>
+<li><a href="#sec-2">2. Clojars</a></li>
+<li><a href="#sec-3">3. Usage</a></li>
+</ul>
+</div>
+</div>
 
-FIXME: description
+# WebSocket Client<a id="sec-1" name="sec-1"></a>
 
-## Installation
+This is the cljs (client) side of the websocket connection.  This
+should be paired with [[<https://github.com/ftravers/websocket-server][ftravers/websocket-server>].
 
-Download from http://example.com/FIXME.
+# Clojars<a id="sec-2" name="sec-2"></a>
 
-## Usage
+[fentontravers/websocket-client "0.3.7"]
 
-FIXME: explanation
-
-    $ java -jar websocket-client-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2017 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+# Usage<a id="sec-3" name="sec-3"></a>
