@@ -25,6 +25,8 @@
                            :verbose true
                            :source-map-timestamp true}}]}
 
+  :repositories [["releases" {:creds :gpg}]]
+  
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [figwheel-sidecar "0.5.4-7"]                                   
                                   [com.cemerick/piggieback "0.2.1"]]
