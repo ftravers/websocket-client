@@ -1,4 +1,4 @@
-(defproject fentontravers/websocket-client "0.3.11-SNAPSHOT"
+(defproject fentontravers/websocket-client "0.3.11"
   :description "WebSocket Client Library"
   :url "https://github.com/ftravers/websocket-client"
   :license {:name "Eclipse Public License"
@@ -13,17 +13,23 @@
   :plugins [[lein-figwheel "0.5.4-7"]
             [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
             [cider/cider-nrepl "0.14.0"]
-            [lein-pprint "1.1.2"]]
+            [lein-pprint "1.1.2"]
+            [lein-doo "0.1.6"]]
   :cljsbuild {:builds
               [{:id "dev"
-                :source-paths ["src/cljs" ]
+                :source-paths ["src/cljs"]
                 :figwheel true
                 :compiler {:main websocket-client.core
                            :asset-path "js"
                            :output-to "resources/public/js/main.js"
                            :output-dir "resources/public/js"
                            :verbose true
-                           :source-map-timestamp true}}]}
+                           :source-map-timestamp true}}
+               {:id "test"
+                :source-paths ["src/cljs" "cljs-test"]
+                :compiler {:optimizations :none
+                           :output-to "out/testable.js"
+                           :main websocket-client.runner}}]}
 
   :repositories [["clojars" {:url "https://clojars.org/repo" :creds :gpg}]
                  ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]

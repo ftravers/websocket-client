@@ -1,6 +1,6 @@
-(ns cljs-websocket-coreasync-simple.runner
+(ns websocket-client.runner
   (:require [doo.runner :refer-macros [doo-tests]]
-            [cljs-websocket-coreasync-simple.core-test]))
+            [websocket-client.core-test]))
 
-(doo-tests 'cljs-websocket-coreasync-simple.core-test)
+(doo-tests 'websocket-client.core-test)
 

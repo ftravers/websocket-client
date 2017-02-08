@@ -19,3 +19,45 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 [fentontravers/websocket-client "0.3.7"]
 
 # Usage<a id="sec-3" name="sec-3"></a>
+
+    (ns ...
+      (:require [cljs.core.async :refer [<! >! chan]]
+                [websocket-client.core :refer [init-websocket!]]))
+    
+    (defn websocket-test []
+      (let [ws-url "ws://localhost:7890"
+            send-chan (chan)
+            recv-chan (chan)
+            send-msg (clojure.string/lower-case "A message from tester.")]
+        (init-websocket! send-chan recv-chan ws-url)
+        (async done
+               (go (>! send-chan send-msg)
+                   (is (= send-msg (clojure.string/lower-case (<! recv-chan))))
+                   (done)))))
+
+We always send strings over websockets.  One interesting usecase (but
+potentially dangerous) is to send EDN over the websocket, for this
+case we just convert the EDN to and from a string.  
+
+    (ns ... 
+      (:require [cljs.reader :refer [read-string]]
+                [cljs.core.async :refer [<! >! chan]]
+                [websocket-client.core :refer [init-websocket!]]))
+    
+    (defn websocket-edn-test []
+      (let [send-chan (chan)
+            recv-chan (chan)]
+        (init-websocket! send-chan recv-chan "ws://localhost:7890")
+        (go (>! send-chan (str {:count 1}))
+            (is (= {:count 11} (read-string (<! recv-chan)))))))
+
+This corresponds to a request handler on the server that looks like:
+
+    (defn request-handler-edn-add10
+      "This function will take some EDN and increment a value by 10, and send it back."
+      [data]
+      (println "Received Data: " (str data))
+      (let [req (edn/read-string data)
+            resp (str {:count (+ 10 (:count req))})]
+        (println "Sending Resp: " resp)
+        resp))
