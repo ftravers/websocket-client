@@ -47,7 +47,7 @@ case we just convert the EDN to and from a string.
         recv-chan (chan)]
     (init-websocket! send-chan recv-chan "ws://localhost:7890")
     (go (>! send-chan (str {:count 1}))
-        (is (= {:count 11} (read-string (<! recv-chan)))))))
+        (.log js/console (= {:count 11} (read-string (<! recv-chan))))))))
 ```
   
 This corresponds to a request handler on the server that looks like:
