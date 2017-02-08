@@ -16,9 +16,7 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 
 # Clojars<a id="sec-2" name="sec-2"></a>
 
-```clj
-[fentontravers/websocket-client "0.3.7"]
-```
+![](https://clojars.org/fentontravers/websocket-client/latest-version.svg)
   
 # Usage<a id="sec-3" name="sec-3"></a>
 
