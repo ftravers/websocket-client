@@ -24,17 +24,13 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 (ns ...
   (:require [cljs.core.async :refer [<! >! chan]]
             [websocket-client.core :refer [init-websocket!]]))
-
 (defn websocket-test []
-  (let [ws-url "ws://localhost:7890"
-        send-chan (chan)
+  (let [send-chan (chan)
         recv-chan (chan)
         send-msg (clojure.string/lower-case "A message from tester.")]
-    (init-websocket! send-chan recv-chan ws-url)
-    (async done
-           (go (>! send-chan send-msg)
-               (is (= send-msg (clojure.string/lower-case (<! recv-chan))))
-               (done)))))
+    (init-websocket! send-chan recv-chan "ws://localhost:7890")
+    (go (>! send-chan send-msg)
+        (.log js/console (<! recv-chan)))))
 ```
   
 We always send strings over websockets.  One interesting usecase (but
