@@ -26,10 +26,9 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
             [websocket-client.core :refer [init-websocket!]]))
 (defn websocket-test []
   (let [send-chan (chan)
-        recv-chan (chan)
-        send-msg (clojure.string/lower-case "A message from tester.")]
+        recv-chan (chan)]
     (init-websocket! send-chan recv-chan "ws://localhost:7890")
-    (go (>! send-chan send-msg)
+    (go (>! send-chan "A test message.")
         (.log js/console (<! recv-chan)))))
 ```
   
