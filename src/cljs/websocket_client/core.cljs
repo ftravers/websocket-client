@@ -1,7 +1,9 @@
 (ns websocket-client.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.reader :refer [read-string]]
-            [cljs.core.async :refer [<! >! chan timeout]]))
+            ;; [cljs.core.async :refer [<! >! chan timeout take! put!]]
+            [cljs.core.async :as async :refer [chan >! <! timeout]]
+            [clojure.core.async.impl.protocols :as impl]))
 
 ;; We break up the send channel into two, one specifically for the
 ;; application we call this the app-send-chan.  This channel is
@@ -12,105 +14,116 @@
 ;; This is why we have to break up the send channel, so the app can
 ;; have a reliably there channel to work with.
 
-(enable-console-print!)
+(declare ws-state log new-websocket! monitor-send-msg-queue!)
 
-(defn log [& args] (.log js/console (reduce str args)))
+(defrecord AsyncWebsocket [ws-url app-send-chan app-recv-chan ws-only-send-chan websocket]
+  impl/ReadPort
+  (take! [aws fn-handler]
+    (.log js/console "TAKE!: >> " aws " <<")
+    (impl/take! (:app-recv-chan aws) fn-handler))
 
-(defonce coms (atom {:ws-url ""
-                     :websocket nil
-                     :ws-only-send-chan nil
-                     :app-send-chan nil
-                     :app-recv-chan nil}))
+  impl/WritePort
+  (put! [aws val fn-handler]
+    (impl/put! (:app-send-chan aws) val fn-handler)))
 
-(def ws-states {0 :not-connected-yet
-                1 :ready-to-transmit
-                3 :ws-closed})
+(defn async-websocket [ws-url]
+  "AsyncWebsocket constructor fn"
+  (-> (->AsyncWebsocket ws-url (chan) (chan) (chan) nil)
+      new-websocket!
+      monitor-send-msg-queue!))
 
-(defn print-coms! []
-  (log "Websocket State: >>" (ws-states (.-readyState (:websocket @coms))) "<<"))
+(defn on-open [aws]
+  "Callback.  When WS opens."
+  (fn []
+    (go
+      (loop []
+        (log "Wait for messages on [ws-only-send-chan].")
+        (log "ws-only-send-chan: >> " (:ws-only-send-chan aws) " <<" )
+        (let [msg (<! (:ws-only-send-chan aws))]
+          (log "Popped message, off websocket only send channel: >> " msg " <<")
+          (log "Will now send over websocket.")
+          (log "Websocket State: >> " (ws-state aws) " <<")
+          (.send (:websocket aws) msg)
+          (log "Sent message over websocket.  Now will wait for next message to send."))
+        (recur)))))
 
-(defn on-open []
-  (go
-    (loop []
-      (let [msg (<! (:ws-only-send-chan @coms))]
-        (log "Popped message, off websocket only send channel: >>" msg "<<")
-        (log "Will now send over websocket.")
-        (print-coms!)
-        (.send (:websocket @coms) msg)
-        (log "Sent message over websocket.  Now will wait for next message to send."))
-      (recur))))
+(defn on-message [aws event]
+  "Callback.  When WS receives a message."
+  (fn []
+    (let [recvd-msg (aget event "data")]
+      (go
+        (log "Got message from websocket: >> " recvd-msg " <<")
+        (log "Putting message on app receive channel.")
+        (>! (:app-recv-chan aws) recvd-msg)))))
 
-(defn make-websocket! []
+(defn new-websocket! [aws]
   "Make new websocket, wire up send/recv channels."
-  (log "Using websocket url: >>" (:ws-url @coms) "<<")
-  (swap! coms assoc-in [:websocket] (js/WebSocket. (:ws-url @coms)))
-  (swap! coms assoc-in [:ws-only-send-chan] (chan))
-  (aset (:websocket @coms) "onopen" on-open)
-  (aset (:websocket @coms)
-        "onmessage"
-        #(go
-           (let [resp (aget % "data")]
-             (log "Got message from websocket: >>" resp "<<")
-             (log "Putting message on app receive channel.")
-             (>! (:app-recv-chan @coms) resp))))
-  (log "Set websocket and core.async send/recv channels: >>" @coms "<<"))
+  (log "NWS: Using websocket url: >> " (:ws-url aws) " <<")
+  (let [new-aws (assoc aws :websocket (js/WebSocket. (:ws-url aws)))]
+    (aset (:websocket new-aws) "onopen" (on-open new-aws))
+    (aset (:websocket new-aws) "onmessage" (partial on-message new-aws))
+    (log "NWS: Finished configuring and instantiating websocket.")
+    new-aws))
 
-(defn- ensure-websocket-connected! [attempt]
+(defn- ensure-websocket-connected! [attempt aws]
   "If websocket is not in ready state, discard and make new one."
-  (log "Checking that websocket is in correct state.  Attempt >>" attempt "<<")
+  (log "EWSC: Checking that websocket is in correct state.  Attempt >> " attempt " <<")
   (if (> attempt 2)
     (throw (js/Error. "Unable to connect to websocket.  Timed out."))
-    (let [state (ws-states (.-readyState (:websocket @coms)))]
-      (case state
-        :ws-closed (do (log "Websocket closed, make a new one.")
-                       (make-websocket!))
-        :not-connected-yet (do (log "Websocket not connected yet, waiting 1/3 of a second")
-                               (go (<! (timeout 300))
-                                   (log "Waited 1/3 of a second.")
-                                   (log "Next attempt: >>" (inc attempt) "<<")
-                                   (ensure-websocket-connected! (inc attempt))))
-        :ready-to-transmit (log "Ready to transmit! Sweet!")
-        (throw (js/Error. "Unable to connect to websocket.  Reason unknown."))))))
+    (case (ws-state aws)
+      :ws-closed (do (log "EWSC Websocket closed, make a new one.")
+                     (new-websocket! aws))
+      :not-connected-yet (do (log "EWSC: Websocket not connected yet, waiting 1/3 of a second")
+                             (go (<! (timeout 300))
+                                 (log "EWSC: Waited 1/3 of a second.")
+                                 (log "EWSC: Next attempt: >> " (inc attempt) " <<")
+                                 (ensure-websocket-connected! (inc attempt) aws)))
+      :ready-to-transmit (do (log "EWSC: Ready to transmit! Sweet!")
+                             aws)
+      (throw (js/Error. "Unable to connect to websocket.  Reason unknown.")))))
 
 (defn monitor-send-msg-queue!
-  [app-send-chan]
+  [aws]
   "We need to check if websocket has timed out before we try to send
   on it.  If it has timed out, we create a new websocket and send on
   that."
   (go
     (loop []
-      (log "Checking to see websocket is connected.")
-      (ensure-websocket-connected! 0)
-      (log "Websocket is connected!  Wait for message on app send channel.")
-      (let [msg (<! app-send-chan)
-            ws (:websocket @coms)
-            ws-only-send-chan (:ws-only-send-chan @coms)]
-        (log "Got message on application send channel: >>" msg "<<")
-        (log "Move onto websocket only send channel.")
-        (>! ws-only-send-chan msg))
-      (recur))))
+      (log "MSMQ: Checking to see websocket is connected.")
+      ;; the following call forks a thread for the timeout, and immediately returns...
+      ;; so not really doing what it implies.
+      (let [new-aws (ensure-websocket-connected! 0 aws)]
+        (log "MSMQ: Websocket is connected!  Wait for message on app send channel.")
+        (log "MSMQ: new-aws >> " (type new-aws) " <<")
+        (log "MSMQ: app-send-chan: >> " (:app-send-chan new-aws) " << ===================   NIL  !!!!!!!!!")
+        (let [msg (<! (:app-send-chan new-aws))]
+          (log "MSMQ: Got message on application send channel: >> " msg " <<")
+          (log "MSMQ: Move onto websocket only send channel.")
+          (>! (:ws-only-send-chan new-aws) msg)))
+      (recur)))
+  aws)
 
-(defn set-parms!
-  [app-send-chan app-recv-chan ws-url]
-  (swap! coms assoc-in [:app-send-chan] app-send-chan)
-  (swap! coms assoc-in [:app-recv-chan] app-recv-chan)
-  (swap! coms assoc-in [:ws-url] ws-url))
+;; -------- Helpers ----------
 
-(defn init-websocket!
-  [app-send-chan app-recv-chan ws-url]
-  (set-parms! app-send-chan app-recv-chan ws-url)
-  (make-websocket!)
-  (monitor-send-msg-queue! app-send-chan))
+(defn ws-state [aws]
+  ({0 :not-connected-yet
+    1 :ready-to-transmit
+    3 :ws-closed}
+   (.-readyState (:websocket aws))))
 
-;; (defn- test-ws! []
-;;   (let [send-chan (chan)
-;;         recv-chan (chan)
-;;         ws-url "ws://localhost:7890"]
-;;     (set-parms! send-chan recv-chan ws-url))
-;;   (log (str (:ws-url @coms)))
-;;   (make-websocket!)
-;;   (go (monitor-send-msg-queue! (:app-send-chan @coms)))
-;;   (go (>! (:app-send-chan @coms) "Dummy Test.")
-;;       (log "From app received channel got message:"
-;;               (str (<! (:app-recv-chan @coms))))))
+(enable-console-print!)
 
+(defn log [& args] (.log js/console (reduce str args)))
+
+;; --------- REPL Testing ----------
+(def url "ws://localhost:7890")
+;; seems okay
+;; (on-open (->AsyncWebsocket url (chan) (chan) (chan) nil))
+
+;; fails
+;; (new-websocket! (->AsyncWebsocket url (chan) (chan) (chan) nil))
+
+;; main test:
+(def ws1 (async-websocket url))
+;; (go (>! ws1 "Hello")
+;;     (.log js/console "Answer" (<! ws1)))

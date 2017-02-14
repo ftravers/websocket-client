@@ -12,7 +12,7 @@
   :target-path "target/%s"
   :plugins [[lein-figwheel "0.5.4-7"]
             [lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
-            [cider/cider-nrepl "0.14.0"]
+            [cider/cider-nrepl "0.15.0-SNAPSHOT"]
             [lein-pprint "1.1.2"]
             [lein-doo "0.1.6"]]
   :cljsbuild {:builds
