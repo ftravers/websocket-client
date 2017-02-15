@@ -6,7 +6,12 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 
 # Clojars
 
+
+![](https://clojars.org/fentontravers/websocket-client/latest-version.svg)
+
 my new html
+
+
 
 ![img](https://clojars.org/fentontravers/websocket-client/latest-version.svg)
 
