@@ -52,12 +52,11 @@
 
 (defn on-message [aws event]
   "Callback.  When WS receives a message."
-  (fn []
-    (let [recvd-msg (aget event "data")]
-      (go
-        (log "Got message from websocket: >> " recvd-msg " <<")
-        (log "Putting message on app receive channel.")
-        (>! (:app-recv-chan aws) recvd-msg)))))
+  (let [recvd-msg (aget event "data")]
+    (go
+      (log "Got message from websocket: >> " recvd-msg " <<")
+      (log "Putting message on app receive channel.")
+      (>! (:app-recv-chan aws) recvd-msg))))
 
 (defn dummy-on-msg [event]
   "Callback.  When WS receives a message."
@@ -69,8 +68,8 @@
   ;; (log "NWS: Using websocket url: >> " (:ws-url aws) " <<")
   (let [new-aws (assoc aws :websocket (js/WebSocket. (:ws-url aws)))]
     (aset (:websocket new-aws) "onopen" (on-open new-aws))
-    ;; (aset (:websocket new-aws) "onmessage" (partial on-message new-aws))
-    (aset (:websocket new-aws) "onmessage" dummy-on-msg)
+    (aset (:websocket new-aws) "onmessage" (partial on-message new-aws))
+    ;; (aset (:websocket new-aws) "onmessage" dummy-on-msg)
     ;; (log "NWS: Finished configuring and instantiating websocket.")
     new-aws))
 (defn monitor-send-msg-queue!
