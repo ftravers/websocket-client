@@ -21,7 +21,6 @@
 (defrecord AsyncWebsocket [ws-url app-send-chan app-recv-chan ws-only-send-chan websocket]
   impl/ReadPort
   (take! [aws fn-handler]
-    (.log js/console "TAKE!: >> " aws " <<")
     (impl/take! (:app-recv-chan aws) fn-handler))
 
   impl/WritePort
@@ -54,8 +53,8 @@
   "Callback.  When WS receives a message."
   (let [recvd-msg (aget event "data")]
     (go
-      (log "Got message from websocket: >> " recvd-msg " <<")
-      (log "Putting message on app receive channel.")
+      ;; (log "Got message from websocket: >> " recvd-msg " <<")
+      ;; (log "Putting message on app receive channel.")
       (>! (:app-recv-chan aws) recvd-msg))))
 
 (defn dummy-on-msg [event]
