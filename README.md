@@ -27,7 +27,7 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 
     ;; Read out of the websocket
     (go (.log js/console (<! aws)))))
-```clojure
+```
 
 We always send strings over websockets.  One interesting usecase (but
 potentially dangerous) is to send EDN over the websocket, for this
