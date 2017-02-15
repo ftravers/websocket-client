@@ -20,8 +20,14 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 
 literal html below
 
-<div class="export">
 <img src="<https://camo.githubusercontent.com/ccd2234bd230e37b073f327b5b4f7112d4f73fd6/68747470733a2f2f636c6f6a6172732e6f72672f66656e746f6e747261766572732f776562736f636b65742d636c69656e742f6c61746573742d76657273696f6e2e737667>" alt="" data-canonical-src="![img](//clojars.org/fentontravers/websocket-client/latest-version.svg)" style="max-width:100%;">
+\\#+END<sub>EXPORT</sub>
+
+more literal below
+
+<div class="export">
+<img
+src="![img](//clojars.org/fentontravers/websocket-client/latest-version.svg)">
 
 </div>
 
