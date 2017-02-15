@@ -15,7 +15,7 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 ```clojure
 (ns ...
   (:require [cljs.core.async :refer [<! >! chan]]
-            [websocket-client.core :refer [init-websocket!]]))
+            [websocket-client.core :refer [async-websocket]]))
 
 (defn websocket-test []
   (let [url  "ws://localhost:7890"
