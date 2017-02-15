@@ -5,21 +5,31 @@ should be paired with [[https://github.com/ftravers/websocket-server][ftravers/w
 
 * Clojars
 
-[fentontravers/websocket-client "0.3.7"]
+[[https://clojars.org/fentontravers/websocket-client/latest-version.svg]]
+
+literal html below
+
+#+BEGIN_EXPORT html
+<img src="https://camo.githubusercontent.com/ccd2234bd230e37b073f327b5b4f7112d4f73fd6/68747470733a2f2f636c6f6a6172732e6f72672f66656e746f6e747261766572732f776562736f636b65742d636c69656e742f6c61746573742d76657273696f6e2e737667" alt="" data-canonical-src="https://clojars.org/fentontravers/websocket-client/latest-version.svg" style="max-width:100%;">
+#+END_EXPORT
 
 * Usage
 
 #+BEGIN_SRC clojure
-(ns ...
-  (:require [cljs.core.async :refer [<! >! chan]]
-            [websocket-client.core :refer [init-websocket!]]))
+  (ns ...
+    (:require [cljs.core.async :refer [<! >! chan]]
+              [websocket-client.core :refer [init-websocket!]]))
 
-(defn websocket-test []
-  (let [send-chan (chan)
-        recv-chan (chan)]
-    (init-websocket! send-chan recv-chan "ws://localhost:7890")
-    (go (>! send-chan "A test message.")
-        (.log js/console (<! recv-chan)))))
+  (defn websocket-test []
+    (let [url  "ws://localhost:7890"
+          aws (async-websocket url)  ;; initialize the websocket
+          ]
+
+      ;; Write into the websocket
+      (go (>! aws "Sending a test messsage."))
+
+      ;; Read out of the websocket
+      (go (.log js/console (<! aws)))))
 #+END_SRC
 
 We always send strings over websockets.  One interesting usecase (but
