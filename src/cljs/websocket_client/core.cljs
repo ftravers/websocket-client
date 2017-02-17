@@ -100,5 +100,5 @@
     3 :ws-closed}
    (.-readyState (:websocket aws))))
 
-(enable-console-print!)
+;; (enable-console-print!)
 
