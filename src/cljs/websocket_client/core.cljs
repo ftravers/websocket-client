@@ -1,6 +1,7 @@
 (ns websocket-client.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.reader :refer [read-string]]
+            [goog.object :refer [set!]]
             ;; [cljs.core.async :refer [<! >! chan timeout take! put!]]
             [cljs.core.async :as async :refer [chan >! <! timeout]]
             [clojure.core.async.impl.protocols :as impl]))
@@ -18,14 +19,18 @@
 
 (declare ws-state log new-websocket! monitor-send-msg-queue! dummy-on-msg)
 
-(defrecord AsyncWebsocket [ws-url app-send-chan app-recv-chan ws-only-send-chan websocket]
-  impl/ReadPort
-  (take! [aws fn-handler]
-    (impl/take! (:app-recv-chan aws) fn-handler))
+(defrecord AsyncWebsocket
+    [ws-url app-send-chan app-recv-chan ws-only-send-chan websocket]
 
-  impl/WritePort
-  (put! [aws val fn-handler]
-    (impl/put! (:app-send-chan aws) val fn-handler)))
+    impl/ReadPort
+    (take! [aws fn-handler]
+      (impl/take! (:app-recv-chan aws) fn-handler))
+
+    impl/WritePort
+    (put! [aws val fn-handler]
+      (log "in put! protocol implementation")
+      (log "aws: >> " (keys aws) " <<")
+      (impl/put! (:app-send-chan aws) val fn-handler)))
 
 (defn async-websocket [ws-url]
   "AsyncWebsocket constructor fn"
@@ -57,20 +62,15 @@
       ;; (log "Putting message on app receive channel.")
       (>! (:app-recv-chan aws) recvd-msg))))
 
-(defn dummy-on-msg [event]
-  "Callback.  When WS receives a message."
-  ;; (.log js/console "!!!!!! got a mesage back!!!!!!!!!")
-  (log "Got message from websocket: >> " (aget event "data") " << !!!!!!!!!!"))
-
 (defn new-websocket! [aws]
   "Make new websocket, wire up send/recv channels."
   ;; (log "NWS: Using websocket url: >> " (:ws-url aws) " <<")
   (let [new-aws (assoc aws :websocket (js/WebSocket. (:ws-url aws)))]
-    (aset (:websocket new-aws) "onopen" (on-open new-aws))
-    (aset (:websocket new-aws) "onmessage" (partial on-message new-aws))
-    ;; (aset (:websocket new-aws) "onmessage" dummy-on-msg)
+    (set! (:websocket new-aws) "onopen" (on-open new-aws))
+    (set! (:websocket new-aws) "onmessage" (partial on-message new-aws))
     ;; (log "NWS: Finished configuring and instantiating websocket.")
     new-aws))
+
 (defn monitor-send-msg-queue!
   [aws]
   "We need to check if websocket has timed out before we try to send
@@ -86,15 +86,8 @@
   aws)
 
 ;; --------- REPL Testing ----------
-(def url "ws://localhost:7890")
-
 ;; main test:
-
-(def ws1 (async-websocket url))
-
-(defn get-on-msg [aws]
-  "get the on-message function for a websocket."
-  (aget (:websocket aws) "onmessage"))
+;; (def ws1 (async-websocket "ws://localhost:7890"))
 
 ;; (go (>! ws1 "Hello"))
 ;; (go (.log js/console "Answer" (<! ws1)))

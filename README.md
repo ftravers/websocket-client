@@ -1,4 +1,3 @@
-
 # WebSocket Client
 
 This is the cljs (client) side of the websocket connection.  This
@@ -6,9 +5,7 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 
 # Clojars
 
-
 ![](https://clojars.org/fentontravers/websocket-client/latest-version.svg)
-
 
 # Usage
 
