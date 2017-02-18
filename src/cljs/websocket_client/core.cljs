@@ -27,8 +27,8 @@
 
     impl/WritePort
     (put! [aws val fn-handler]
-      (log "in put! protocol implementation")
-      (log "aws: >> " (keys aws) " <<")
+      ;; (log "in put! protocol implementation")
+      ;; (log "aws: >> " (keys aws) " <<")
       (impl/put! (:app-send-chan aws) val fn-handler)))
 
 (defn async-websocket [ws-url]
@@ -42,7 +42,7 @@
   (fn []
     (go
       (loop []
-        (log "Wait for messages on [ws-only-send-chan].")
+        ;; (log "Wait for messages on [ws-only-send-chan].")
         ;; (log "ws-only-send-chan: >> " (:ws-only-send-chan aws) " <<" )
         (let [msg (<! (:ws-only-send-chan aws))]
           ;; (log "Popped message, off websocket only send channel: >> " msg " <<")
