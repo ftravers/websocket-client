@@ -11,12 +11,12 @@ should be paired with [ftravers/websocket-server](https://github.com/ftravers/we
 
 ```clojure
 (ns ...
-  (:require [cljs.core.async :refer [<! >! chan]]
+  (:require [cljs.core.async :refer [<! >!]]
             [websocket-client.core :refer [async-websocket]]))
 
 (defn websocket-test []
   (let [url  "ws://localhost:7890"
-        aws (async-websocket url)  ;; initialize the websocket
+        aws (async-websocket url)  ;; initialize & connect on the websocket
         ]
 
     ;; Write into the websocket
