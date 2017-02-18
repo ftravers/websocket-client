@@ -26,10 +26,10 @@
                            :output-to "out/testable.js"
                            :main websocket-client.runner}}]}
 
-  :repositories [["clojars" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ["releases" {:url "https://clojars.org/repo" :creds :gpg}]
-                 ["alternate" {:url "https://clojars.org/repo" :creds :gpg} ]]
+  ;; :repositories [["clojars" {:url "https://clojars.org/repo" :creds :gpg}]
+  ;;                ["snapshots" {:url "https://clojars.org/repo" :creds :gpg}]
+  ;;                ["releases" {:url "https://clojars.org/repo" :creds :gpg}]
+  ;;                ["alternate" {:url "https://clojars.org/repo" :creds :gpg} ]]
   
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [figwheel-sidecar "0.5.4-7"]                                   

@@ -1,8 +1,7 @@
 (ns websocket-client.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [cljs.reader :refer [read-string]]
-            [goog.object :refer [set!]]
-            ;; [cljs.core.async :refer [<! >! chan timeout take! put!]]
+            [goog.object :refer [set]]
             [cljs.core.async :as async :refer [chan >! <! timeout]]
             [clojure.core.async.impl.protocols :as impl]))
 
@@ -43,7 +42,7 @@
   (fn []
     (go
       (loop []
-        ;; (log "Wait for messages on [ws-only-send-chan].")
+        (log "Wait for messages on [ws-only-send-chan].")
         ;; (log "ws-only-send-chan: >> " (:ws-only-send-chan aws) " <<" )
         (let [msg (<! (:ws-only-send-chan aws))]
           ;; (log "Popped message, off websocket only send channel: >> " msg " <<")
@@ -66,8 +65,11 @@
   "Make new websocket, wire up send/recv channels."
   ;; (log "NWS: Using websocket url: >> " (:ws-url aws) " <<")
   (let [new-aws (assoc aws :websocket (js/WebSocket. (:ws-url aws)))]
-    (set! (:websocket new-aws) "onopen" (on-open new-aws))
-    (set! (:websocket new-aws) "onmessage" (partial on-message new-aws))
+    ;; (aset (:websocket new-aws) "onopen" (on-open new-aws))
+    ;; (.goog.object/set (:websocket new-aws) "onopen" (on-open new-aws))
+    (set (:websocket new-aws) "onopen" (on-open new-aws))
+    ;; (aset (:websocket new-aws) "onmessage" (partial on-message new-aws))
+    (set (:websocket new-aws) "onmessage" (partial on-message new-aws))
     ;; (log "NWS: Finished configuring and instantiating websocket.")
     new-aws))
 
