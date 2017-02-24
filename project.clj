@@ -28,7 +28,7 @@
                            :main websocket-client.runner}}]}
 
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
-                                  [figwheel-sidecar "0.5.4-7"]                                   
+                                  [figwheel-sidecar "0.5.9"]                                   
                                   [com.cemerick/piggieback "0.2.1"]]
                    :source-paths ["src/cljs"]
                    :repl-options {:init (set! *print-length* 50)
