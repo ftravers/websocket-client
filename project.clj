@@ -5,8 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.456"]
-                 [org.clojure/core.async "0.2.395" :exclusions [org.clojure/tools.reader]]
-                 [com.taoensso/timbre "4.8.0"]]
+                 [org.clojure/core.async "0.2.395" :exclusions [org.clojure/tools.reader]]]
   
   :source-paths ["src/cljs"]
   :clean-targets ^{:protect false} ["target" "resources/public/js"]
